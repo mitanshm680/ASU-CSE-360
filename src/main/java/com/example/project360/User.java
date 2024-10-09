@@ -3,6 +3,13 @@ package com.example.project360;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The User class manages user data and functionality, including:
+ * - User registration using an invitation system.
+ * - Role management (Student, Instructor, Admin, etc.).
+ * - Secure login via passwords and OTP (invitation codes).
+ */
+
 public class User {
     private String username; // The user's unique username
     private String password;  // The user's password, initially the invitation code
@@ -27,17 +34,6 @@ public class User {
         this.roles = new ArrayList<>(); // Initialize the roles list
         addRole("Student"); // Assign the default role "Student" to the new user
         userList.add(this); // Add the new user to the user list
-    }
-
-    // Static method to handle user login
-    public static boolean login(String username, String password) {
-        for (User user : userList) {
-            // Check if the username and password match any user
-            if (user.username.equals(username) && user.password.equals(password)) {
-                return true; // Successful login
-            }
-        }
-        return false; // Failed login if no match is found
     }
 
     // Static method to delete a user by username
