@@ -16,6 +16,8 @@ public class User {
     private long oneTimePasswordExpiry; // Expiry time for OTP
     private String invitationCode; // To store the invitation code
     private long invitationCodeExpiry;
+    public static List<User> userList = new ArrayList<>();
+
 
     public User(String username, String invitationCode) {
         this.username = username;
@@ -24,7 +26,38 @@ public class User {
         this.invitationCodeExpiry = System.currentTimeMillis() + 3600000; // Valid for 1 hour
         this.roles = new ArrayList<>();
         addRole("Student"); // Default role
+        userList.add(this);
     }
+
+    public static boolean login(String username, String password) {
+        for (User user : userList) {
+            if (user.username.equals(username) && user.password.equals(password)) {
+                return true; // Successful login
+            }
+        }
+        return false; // Failed login
+    }
+
+    public static boolean deleteUser(String username) {
+        User userToRemove = findUser(username);
+        if (userToRemove != null) {
+            userList.remove(userToRemove);
+            return true; // Deletion successful
+        }
+        return false; // User not found
+    }
+
+
+    public static User findUser(String username) {
+        for (User user : userList) {
+            if (user.username.equals(username)) {
+                return user;
+            }
+        }
+        return null; // User not found
+    }
+
+
 
     public String getEmail() {
         return email;

@@ -7,7 +7,6 @@ import java.util.Random;
 public class Admin extends User {
     private List<User> users;
 
-
     public Admin(String username, String password, List<User> users) {
         super(username, password);
         this.users = users;
@@ -28,11 +27,22 @@ public class Admin extends User {
         users.add(invitedUser); // Add the invited user to the user list
     }
 
-    public void listUsers(List<User> users) {
+    public void listUsers() {
         System.out.println("Listing users:");
         for (User user : users) {
             System.out.println(user.getUsername() + " - " + user.getFirstName() + " " + user.getLastName() + " Roles: " + user.getRoles());
         }
+    }
+
+
+    public static boolean deleteUser(String username) {
+        boolean isDeleted = User.deleteUser(username); // Call the static deleteUser method from User
+        if (isDeleted) {
+            System.out.println("User " + username + " has been deleted.");
+        } else {
+            System.out.println("User " + username + " not found.");
+        }
+        return isDeleted; // Return the result of the deletion attempt
     }
 
 
@@ -48,10 +58,7 @@ public class Admin extends User {
         System.out.println("Reset password for user: " + user.getUsername() + " with one-time password: " + oneTimePassword);
     }
 
-    public void deleteUser(User user) {
-        // Logic to delete user (not implemented in this example)
-        System.out.println("Deleted user: " + user.getUsername());
-    }
+
 
     public void addRoleToUser(User user, String role) {
         user.addRole(role);

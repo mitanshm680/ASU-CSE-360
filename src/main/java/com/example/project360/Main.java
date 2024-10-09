@@ -200,22 +200,55 @@ public class Main extends Application {
         Button inviteUserButton = new Button("Invite User");
         Button listUsersButton = new Button("List Users");
         Button updateDetailsButton = new Button("Update Personal Details");
+        Button deleteUserButton = new Button("Delete User"); // New delete user button
 
-        layout.getChildren().addAll(welcomeLabel, changePasswordButton, inviteUserButton, updateDetailsButton, listUsersButton, logoutButton);
+        layout.getChildren().addAll(welcomeLabel, changePasswordButton, inviteUserButton,
+                updateDetailsButton, listUsersButton, deleteUserButton, logoutButton);
         Scene homeScene = new Scene(layout, 300, 250);
 
         changePasswordButton.setOnAction(e -> showChangePasswordPage(user));
         inviteUserButton.setOnAction(e -> showInviteUserPage(user));
         listUsersButton.setOnAction(e -> showUserList(user));
+        deleteUserButton.setOnAction(e -> showDeleteUserPage(user)); // Add action for delete user
         logoutButton.setOnAction(e -> primaryStage.setScene(loginScene));
         updateDetailsButton.setOnAction(e -> showUpdateUserDetailsPage(user));
 
         primaryStage.setScene(homeScene);
     }
 
+    private void showDeleteUserPage(User user) {
+        if (user instanceof Admin) {
+            VBox layout = new VBox(10);
+            TextField usernameField = new TextField();
+            Button deleteButton = new Button("Delete");
+            Button backButton = new Button("Back");
+
+            layout.getChildren().addAll(new Label("Enter Username to Delete:"), usernameField, deleteButton, backButton);
+
+            deleteButton.setOnAction(e -> {
+                String username = usernameField.getText();
+                boolean isDeleted = Admin.deleteUser(username); // Call the static deleteUser method
+                if (isDeleted) {
+                    showAlert("Success", username + " has been deleted.");
+                } else {
+                    showAlert("Error", "User not found.");
+                }
+            });
+
+            backButton.setOnAction(e -> showHomePage(user));
+
+            Scene deleteUserScene = new Scene(layout, 300, 200);
+            primaryStage.setScene(deleteUserScene);
+        } else {
+            showAlert("Access Denied", "Only admins can delete users.");
+        }
+    }
+
+
+
     private void showUserList(User user) {
         if (user instanceof Admin) {
-            ((Admin) user).listUsers(users); // Admin lists users
+            ((Admin) user).listUsers(); // Admin lists users
             showAlert("User List", "Check console for the list of users."); // Notify user
         } else {
             showAlert("Access Denied", "Only admins can view the user list.");
