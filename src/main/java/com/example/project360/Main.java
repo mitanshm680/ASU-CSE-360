@@ -5,7 +5,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
+import javafx.stage.Stage; // Import the Stage class if you are using it
+import java.util.Arrays; // Import Arrays class
+import java.util.List; // Import List interface
 import java.util.ArrayList;
 import java.util.List;
 
@@ -316,6 +318,7 @@ public class Main extends Application {
      *
      * @param user - The logged-in user for whom the home page is being displayed
      */
+
     private void showHomePage(User user) {
         VBox layout = new VBox(10); // Vertical layout with 10px spacing
 
@@ -329,11 +332,13 @@ public class Main extends Application {
         Button listUsersButton = new Button("List Users"); // Button to list all users
         Button updateDetailsButton = new Button("Update Personal Details"); // Button to update personal details
         Button deleteUserButton = new Button("Delete User"); // Button to delete users (visible to admin only)
+        Button helpSystemButton = new Button("Manage Help Articles"); // Button to manage help articles
 
         // Add all UI components to the layout
         layout.getChildren().addAll(
                 welcomeLabel, changePasswordButton, inviteUserButton,
-                updateDetailsButton, listUsersButton, deleteUserButton, logoutButton
+                updateDetailsButton, listUsersButton, deleteUserButton,
+                helpSystemButton, logoutButton
         );
 
         // Create a new Scene for the home page with a size of 300x250 pixels
@@ -352,6 +357,13 @@ public class Main extends Application {
 
         // Delete user action - Opens the delete user page (visible only to admin)
         deleteUserButton.setOnAction(e -> showDeleteUserPage(user)); // Action for delete user
+
+        // Help system action - Opens the help system management page if user is admin
+        if (user.hasRole("Admin")) { // Check if the user has admin privileges
+            helpSystemButton.setOnAction(e -> showHelpSystemPage((Admin) user)); // Cast user to Admin
+        } else {
+            helpSystemButton.setDisable(true); // Disable the button for non-admin users
+        }
 
         // Logout action - Returns to the login page
         logoutButton.setOnAction(e -> primaryStage.setScene(loginScene));
@@ -541,6 +553,102 @@ public class Main extends Application {
         alert.setHeaderText(null); // No header
         alert.setContentText(message); // Set the content of the alert
         alert.showAndWait(); // Display the alert and wait for user interaction
+    }
+
+    private void showHelpSystemPage(Admin admin) {
+        VBox layout = new VBox(10); // Vertical layout with 10px spacing
+
+        // UI elements for managing help articles
+        TextField titleField = new TextField(); // Title field
+        TextField shortDescriptionField = new TextField(); // Short description field
+        TextField keywordsField = new TextField(); // Keywords field
+        TextArea bodyField = new TextArea(); // Body field
+        Button createButton = new Button("Create Article");
+        Button deleteButton = new Button("Delete Article");
+        Button listButton = new Button("List Articles");
+
+        // ComboBox for selecting an article to view
+        ComboBox<HelpArticle> articleComboBox = new ComboBox<>();
+        Button viewButton = new Button("View Article Content");
+
+        // Populate ComboBox with articles (ensure you have a method to get articles)
+        articleComboBox.getItems().addAll(admin.listArticles()); // Now this will work as expected
+        // Add UI components to the layout
+        layout.getChildren().addAll(
+                new Label("Title:"), titleField,
+                new Label("Short Description:"), shortDescriptionField,
+                new Label("Keywords (comma-separated):"), keywordsField,
+                new Label("Body:"), bodyField,
+                createButton, deleteButton, listButton,
+                new Label("Select an Article:"), articleComboBox,
+                viewButton // Add view button
+        );
+
+        // Create article action
+        createButton.setOnAction(e -> {
+            long articleId = System.currentTimeMillis(); // Generate a unique ID using the current timestamp
+            HelpArticle newArticle = new HelpArticle(
+                    articleId,
+                    titleField.getText(),
+                    shortDescriptionField.getText(),
+                    bodyField.getText(),
+                    List.of(keywordsField.getText().split(",")), // Split keywords by comma
+                    List.of(), // References can be set as needed
+                    "General", // Level can be set as required
+                    List.of(), // Groups can be set as needed
+                    null // Sensitive description if any
+            );
+
+            admin.addArticle(newArticle); // Call the method to add the article
+            articleComboBox.getItems().add(newArticle); // Update ComboBox with the new article
+            showAlert("Success", "Article created successfully.");
+        });
+
+        // Delete article action
+        deleteButton.setOnAction(e -> {
+            // Assuming the titleField contains the ID for simplicity
+            long articleId = Long.parseLong(titleField.getText());
+            if (admin.deleteArticle(articleId)) {
+                articleComboBox.getItems().removeIf(article -> article.getId() == articleId); // Remove from ComboBox
+                showAlert("Success", "Article deleted successfully.");
+            } else {
+                showAlert("Error", "Article not found for deletion.");
+            }
+        });
+
+        // List articles action
+        listButton.setOnAction(e -> {
+            admin.listArticles(); // Lists articles in the console
+            showAlert("Article List", "Check console for the list of help articles.");
+        });
+
+        // View article content action
+        viewButton.setOnAction(e -> {
+            HelpArticle selectedArticle = articleComboBox.getValue();
+            if (selectedArticle != null) {
+                showArticleContent(selectedArticle); // Show the content of the selected article
+            } else {
+                showAlert("Error", "Please select an article to view.");
+            }
+        });
+
+        // Create a new Scene for the help system management with a size of 400x400 pixels
+        Scene helpSystemScene = new Scene(layout, 400, 400);
+        primaryStage.setScene(helpSystemScene); // Switch to the help system management scene
+    }
+
+    private void showArticleContent(HelpArticle article) {
+        VBox layout = new VBox(10); // Vertical layout with 10px spacing
+        layout.getChildren().add(new Label("Title: " + article.getTitle()));
+        layout.getChildren().add(new Label("Short Description: " + article.getShortDescription()));
+        layout.getChildren().add(new Label("Body:"));
+        TextArea bodyTextArea = new TextArea(article.getBody());
+        bodyTextArea.setEditable(false); // Make the body field non-editable
+        layout.getChildren().add(bodyTextArea);
+
+        // Create a Scene for viewing the article content
+        Scene articleContentScene = new Scene(layout, 400, 300);
+        primaryStage.setScene(articleContentScene); // Switch to the article content scene
     }
 
 }

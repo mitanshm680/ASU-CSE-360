@@ -2,6 +2,7 @@ package com.example.project360;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * The User class manages user data and functionality, including:
@@ -24,6 +25,7 @@ public class User {
     private String invitationCode; // Code used to invite the user to the system
     private long invitationCodeExpiry; // Expiry time for the invitation code (in milliseconds)
     public static List<User> userList = new ArrayList<>(); // Static list storing all users
+    private static List<HelpArticle> articles = new ArrayList<>(); // List of HelpArticle objects
 
     // Constructor to create a new user with a username and an invitation code
     public User(String username, String invitationCode) {
@@ -122,6 +124,11 @@ public class User {
         }
     }
 
+    // Method to check if the user has a specific role
+    public boolean hasRole(String role) {
+        return roles.contains(role);
+    }
+
     // Method to remove a role from the user
     public void removeRole(String role) {
         roles.remove(role);
@@ -161,7 +168,85 @@ public class User {
     // Method to set a new invitation code with a 1-hour expiry time
     public void setInvitationCode(String invitationCode) {
         this.invitationCode = invitationCode;
-        this.invitationCodeExpiry = System.currentTimeMillis() + 360000; // One time password valid for exactly 6 minutes
+        this.invitationCodeExpiry = System.currentTimeMillis() + 3600000; // One time password valid for 1 hour
     }
 
+    // Method to add a help article
+    public static void addHelpArticle() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter article title: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Enter short description: ");
+        String shortDescription = scanner.nextLine();
+
+        System.out.print("Enter article body: ");
+        String body = scanner.nextLine();
+
+        System.out.print("Enter keywords (comma-separated): ");
+        List<String> keywords = List.of(scanner.nextLine().split(","));
+
+        System.out.print("Enter references (comma-separated): ");
+        List<String> references = List.of(scanner.nextLine().split(","));
+
+        System.out.print("Enter article level (e.g., Beginner, Intermediate): ");
+        String level = scanner.nextLine();
+
+        System.out.print("Enter groups (comma-separated): ");
+        List<String> groups = List.of(scanner.nextLine().split(","));
+
+        System.out.print("Enter sensitive description (optional): ");
+        String sensitiveDescription = scanner.nextLine();
+
+        HelpArticle article = new HelpArticle(
+                System.currentTimeMillis(), title, shortDescription, body, keywords, references, level, groups, sensitiveDescription
+        );
+
+        articles.add(article); // Add the article to the list
+        System.out.println("Help article added successfully!");
+    }
+
+    // Method to delete a help article
+    public static void deleteHelpArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the ID of the article to delete: ");
+        long articleId = scanner.nextLong();
+
+        boolean removed = articles.removeIf(article -> article.getId() == articleId);
+        System.out.println(removed ? "Help article deleted." : "Article not found.");
+    }
+
+    // Method to list all help articles
+    public static void listHelpArticles() {
+        System.out.println("Listing all help articles:");
+        for (HelpArticle article : articles) {
+            System.out.println("ID: " + article.getId() + " | Title: " + article.getTitle());
+        }
+    }
+
+    // Method for users to view help articles
+    public void viewHelpArticles() {
+        System.out.println("Available Help Articles:");
+        for (HelpArticle article : articles) {
+            System.out.println("ID: " + article.getId() + " - Title: " + article.getTitle());
+        }
+    }
+
+    // Method for users to view the details of a specific help article
+    public void viewArticleDetails(long articleId) {
+        for (HelpArticle article : articles) {
+            if (article.getId() == articleId) {
+                System.out.println("Title: " + article.getTitle());
+                System.out.println("Description: " + article.getShortDescription());
+                System.out.println("Body: " + article.getBody());
+                System.out.println("Keywords: " + String.join(", ", article.getKeywords()));
+                System.out.println("References: " + String.join(", ", article.getReferences()));
+                System.out.println("Level: " + article.getLevel());
+                System.out.println("Groups: " + String.join(", ", article.getGroups()));
+                return;
+            }
+        }
+        System.out.println("Article not found."); // If the article doesn't exist
+    }
 }

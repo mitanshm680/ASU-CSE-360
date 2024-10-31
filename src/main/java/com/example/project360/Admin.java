@@ -11,6 +11,7 @@ import java.util.Random;
  */
 public class Admin extends User {
     private List<User> users; // List of users that the admin can manage
+    private List<HelpArticle> helpArticles; // List of help articles managed by the admin
 
     /**
      * Constructor for Admin class. Calls the superclass constructor (User)
@@ -23,6 +24,7 @@ public class Admin extends User {
     public Admin(String username, String password, List<User> users) {
         super(username, password); // Call to the superclass User constructor
         this.users = users; // Initialize the user list
+        this.helpArticles = new ArrayList<>(); // Initialize the help articles list
         addRole("Admin"); // Automatically add the "Admin" role to this user
     }
 
@@ -148,4 +150,39 @@ public class Admin extends User {
         user.removeRole(role); // Call the removeRole method in User to remove the role
         System.out.println("Removed role " + role + " from user: " + user.getUsername());
     }
+
+    /**
+     * Adds a help article to the admin's managed list.
+     *
+     * @param article - The HelpArticle to be added
+     */
+    public void addArticle(HelpArticle article) {
+        helpArticles.add(article);
+        System.out.println("Added article: " + article.getTitle());
+    }
+
+    /**
+     * Deletes a help article by its ID.
+     *
+     * @param articleId - The ID of the article to delete
+     * @return true if the article was found and deleted, false otherwise
+     */
+    public boolean deleteArticle(long articleId) {
+        for (HelpArticle article : helpArticles) {
+            if (article.getId() == articleId) {
+                helpArticles.remove(article);
+                System.out.println("Deleted article: " + article.getTitle());
+                return true;
+            }
+        }
+        return false; // Article not found
+    }
+    public List<HelpArticle> listArticles() {
+        System.out.println("Listing help articles:");
+        for (HelpArticle article : helpArticles) {
+            System.out.println("ID: " + article.getId() + " - Title: " + article.getTitle());
+        }
+        return new ArrayList<>(helpArticles); // Return a copy of the list
+    }
+
 }
