@@ -1,6 +1,6 @@
-# ASU CSE 360 Project Phase 1
+# ASU CSE 360 Project Phase 2
 
-This is a JavaFX-based Help System for students and instructors at Arizona State University (ASU). The system allows an admin to invite users, manage their roles, and reset their passwords. Students can log in, update their personal details, and interact with the system.
+This is a JavaFX-based Help System for students and instructors at Arizona State University (ASU). The system allows an admin to invite users, manage their roles, and reset their passwords. Students can log in, update their personal details, and interact with the system. Instructors could add, delete, edit, and search for help articles.
 
 ## Features
 
@@ -8,6 +8,7 @@ This is a JavaFX-based Help System for students and instructors at Arizona State
 - Users can reset their passwords using a one-time invitation code.
 - Admin can delete users and manage their roles.
 - Users can update their personal information like email and preferred name after logging in.
+- Instructors and Admin can add, delete, edit, and search for help articles form the help system.
 
 ## Technologies Used
 
@@ -55,6 +56,7 @@ To run this project, you will need to have the following installed:
 - If you're the admin, create an account with admin privileges.
 - The admin can invite new users, assign roles, reset passwords, and delete users.
 - Users can update their personal details after logging in.
+- If you're assigned the instructor role, you will have added permissions relating to the help articles. 
 
 ### Project Structure
 
@@ -67,6 +69,8 @@ project360/
 │   │   │   ├── Main.java           # Entry point for the JavaFX application
 │   │   │   ├── User.java           # User class with roles and methods
 │   │   │   ├── Admin.java          # Admin-specific functionalities
+│   │   │   ├── Instructor.java     # Instructor-specific functionalities
+│   │   │   ├── HelpArticle.java    # Class for the help article system
 │   │   │   └── other-classes       # Other supporting classes
 │   │   ├── resources/
 │   │       └── fxml/               # FXML files for UI
