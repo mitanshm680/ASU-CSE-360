@@ -3,6 +3,8 @@ package com.example.project360;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.io.*;
+import java.util.*;
 
 /**
  * The Admin class extends the User class, adding special functionalities
@@ -19,7 +21,7 @@ public class Admin extends User {
      *
      * @param username - Admin's username
      * @param password - Admin's password
-     * @param users - List of users the admin manages
+     * @param users    - List of users the admin manages
      */
     public Admin(String username, String password, List<User> users) {
         super(username, password); // Call to the superclass User constructor
@@ -40,11 +42,11 @@ public class Admin extends User {
     /**
      * Invites a new user by creating a User object and assigning a role.
      *
-     * @param username - The new user's username
-     * @param role - The role assigned to the new user (e.g., Student, Instructor)
-     * @param firstName - The new user's first name
-     * @param lastName - The new user's last name
-     * @param email - The new user's email address
+     * @param username           - The new user's username
+     * @param role               - The role assigned to the new user (e.g., Student, Instructor)
+     * @param firstName          - The new user's first name
+     * @param lastName           - The new user's last name
+     * @param email              - The new user's email address
      * @param preferredFirstName - The new user's preferred first name
      */
     public void inviteUser(String username, String role, String firstName, String lastName, String email, String preferredFirstName) {
@@ -177,6 +179,7 @@ public class Admin extends User {
         }
         return false; // Article not found
     }
+
     public List<HelpArticle> listArticles() {
         System.out.println("Listing help articles:");
         for (HelpArticle article : helpArticles) {
@@ -185,4 +188,59 @@ public class Admin extends User {
         return new ArrayList<>(helpArticles); // Return a copy of the list
     }
 
+    public void backupArticles(String filename) {
+        try (Writer writer = new BufferedWriter(new FileWriter(filename))) {
+            for (HelpArticle article : articles) {
+                writer.write(article.getId() + "," + article.getTitle() + "," +
+                        article.getShortDescription() + "," + article.getBody() + "," +
+                        String.join(";", article.getKeywords()) + "\n");
+            }
+            System.out.println("Backup successful.");
+        } catch (IOException e) {
+            System.out.println("Backup failed: " + e.getMessage());
+        }
+    }
+
+    public void restoreArticles(String filename, boolean removeExisting) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            if (removeExisting) {
+                articles.clear(); // Remove all existing articles
+            }
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", -1); // Split by comma
+
+                // Ensure we have the correct number of parts
+                if (parts.length < 9) {
+                    System.out.println("Invalid line format: " + line);
+                    continue; // Skip this line if it's invalid
+                }
+
+                long id = Long.parseLong(parts[0].trim());
+                String title = parts[1].trim();
+                String shortDescription = parts[2].trim();
+                String body = parts[3].trim();
+
+                // Split keywords and references by semicolon
+                List<String> keywords = new ArrayList<>(Arrays.asList(parts[4].trim().split(";")));
+                List<String> references = new ArrayList<>(Arrays.asList(parts[5].trim().split(";")));
+                String level = parts[6].trim();
+                List<String> groups = new ArrayList<>(Arrays.asList(parts[7].trim().split(";")));
+                String sensitiveDescription = parts[8].trim();
+
+                HelpArticle backupArticle = new HelpArticle(id, title, shortDescription, body,
+                        keywords, references, level, groups, sensitiveDescription);
+
+                // Check if the ID already exists before adding
+                if (!articles.stream().anyMatch(article -> article.getId() == backupArticle.getId())) {
+                    articles.add(backupArticle); // Add only if the ID is unique
+                }
+            }
+            System.out.println("Restore successful.");
+        } catch (IOException e) {
+            System.out.println("Restore failed: " + e.getMessage());
+        }
+
+    }
 }

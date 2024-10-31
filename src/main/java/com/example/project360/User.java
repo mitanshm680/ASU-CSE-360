@@ -25,7 +25,7 @@ public class User {
     private String invitationCode; // Code used to invite the user to the system
     private long invitationCodeExpiry; // Expiry time for the invitation code (in milliseconds)
     public static List<User> userList = new ArrayList<>(); // Static list storing all users
-    private static List<HelpArticle> articles = new ArrayList<>(); // List of HelpArticle objects
+    public static List<HelpArticle> articles = new ArrayList<>(); // List of HelpArticle objects
 
     // Constructor to create a new user with a username and an invitation code
     public User(String username, String invitationCode) {

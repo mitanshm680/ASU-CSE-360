@@ -5,11 +5,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.stage.Stage; // Import the Stage class if you are using it
-import java.util.Arrays; // Import Arrays class
+
 import java.util.List; // Import List interface
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The Main class is the entry point for the JavaFX application.
@@ -567,12 +565,21 @@ public class Main extends Application {
         Button deleteButton = new Button("Delete Article");
         Button listButton = new Button("List Articles");
 
+        // Backup and Restore buttons
+        Button backupButton = new Button("Backup Articles");
+        Button restoreButton = new Button("Restore Articles");
+        TextField backupFileField = new TextField(); // Field for backup file name
+
         // ComboBox for selecting an article to view
         ComboBox<HelpArticle> articleComboBox = new ComboBox<>();
         Button viewButton = new Button("View Article Content");
 
-        // Populate ComboBox with articles (ensure you have a method to get articles)
-        articleComboBox.getItems().addAll(admin.listArticles()); // Now this will work as expected
+        // Back button
+        Button backButton = new Button("Back");
+
+        // Populate ComboBox with articles
+        articleComboBox.getItems().addAll(admin.listArticles());
+
         // Add UI components to the layout
         layout.getChildren().addAll(
                 new Label("Title:"), titleField,
@@ -581,7 +588,8 @@ public class Main extends Application {
                 new Label("Body:"), bodyField,
                 createButton, deleteButton, listButton,
                 new Label("Select an Article:"), articleComboBox,
-                viewButton // Add view button
+                viewButton, backupFileField, backupButton, restoreButton,
+                backButton // Add back button
         );
 
         // Create article action
@@ -632,6 +640,32 @@ public class Main extends Application {
             }
         });
 
+        // Backup articles action
+        backupButton.setOnAction(e -> {
+            String filename = backupFileField.getText();
+            if (!filename.isEmpty()) {
+                admin.backupArticles(filename); // Method to backup articles to the specified file
+                showAlert("Success", "Articles backed up to " + filename);
+            } else {
+                showAlert("Error", "Please enter a valid filename for backup.");
+            }
+        });
+
+        // Restore articles action
+        restoreButton.setOnAction(e -> {
+            String filename = backupFileField.getText();
+            if (!filename.isEmpty()) {
+                boolean removeExisting = confirmRestore(); // Method to confirm if the user wants to remove existing articles
+                admin.restoreArticles(filename, removeExisting); // Method to restore articles from the specified file
+                showAlert("Success", "Articles restored from " + filename);
+            } else {
+                showAlert("Error", "Please enter a valid filename for restore.");
+            }
+        });
+
+        // Back button action
+        backButton.setOnAction(e -> showHomePage(admin)); // Go back to the home page
+
         // Create a new Scene for the help system management with a size of 400x400 pixels
         Scene helpSystemScene = new Scene(layout, 400, 400);
         primaryStage.setScene(helpSystemScene); // Switch to the help system management scene
@@ -639,16 +673,48 @@ public class Main extends Application {
 
     private void showArticleContent(HelpArticle article) {
         VBox layout = new VBox(10); // Vertical layout with 10px spacing
+
+        // Add article details to the layout
         layout.getChildren().add(new Label("Title: " + article.getTitle()));
         layout.getChildren().add(new Label("Short Description: " + article.getShortDescription()));
         layout.getChildren().add(new Label("Body:"));
+
+        // TextArea for the body of the article
         TextArea bodyTextArea = new TextArea(article.getBody());
         bodyTextArea.setEditable(false); // Make the body field non-editable
-        layout.getChildren().add(bodyTextArea);
+        layout.getChildren().add(bodyTextArea); // Add the body text area to the layout
+
+        // Create the Back button
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> showHelpSystemPage(admin)); // Go back to the help system page
+        layout.getChildren().add(backButton); // Add the back button to the layout
 
         // Create a Scene for viewing the article content
         Scene articleContentScene = new Scene(layout, 400, 300);
         primaryStage.setScene(articleContentScene); // Switch to the article content scene
+    }
+
+    private boolean confirmRestore() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Restore Confirmation");
+        alert.setHeaderText("Do you want to remove existing articles before restoring?");
+        alert.setContentText("Choose your option.");
+
+        ButtonType buttonTypeOne = new ButtonType("Remove Existing Articles");
+        ButtonType buttonTypeTwo = new ButtonType("Merge with Existing Articles");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+        // Show the alert and wait for a response
+        alert.showAndWait();
+
+        // Check which button was clicked
+        if (alert.getResult() == buttonTypeOne) {
+            return true; // User chose to remove existing articles
+        } else {
+            return false; // User chose to merge or cancel
+        }
     }
 
 }
