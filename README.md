@@ -1,14 +1,89 @@
-# ASU CSE 360 Project Phase 2
+
+
+# ASU CSE 360 Project Phase 3
 
 This is a JavaFX-based Help System for students and instructors at Arizona State University (ASU). The system allows an admin to invite users, manage their roles, and reset their passwords. Students can log in, update their personal details, and interact with the system. Instructors could add, delete, edit, and search for help articles.
 
-## Features
+## Core Features
 
-- Admin can invite users and assign roles (`Student`, `Instructor`).
-- Users can reset their passwords using a one-time invitation code.
-- Admin can delete users and manage their roles.
-- Users can update their personal information like email and preferred name after logging in.
-- Instructors and Admin can add, delete, edit, and search for help articles form the help system.
+### 1. **User Management**
+The system offers a comprehensive suite of user management features:
+- **Roles**: Users can hold multiple roles (`Student`, `Instructor`, `Admin`), with corresponding permissions.
+- **Secure Authentication**:
+   - Password-based and OTP-based account setup/reset.
+   - Invitation-based user registration with expiring invitation codes.
+- **User Profile Management**:
+   - Store and update personal details (name, email, etc.).
+   - Track active roles for multi-role users.
+- **Administrative Functions**:
+   - Manage user roles and permissions.
+   - Invite or delete users.
+   - Generate and manage invitation codes.
+
+### 2. **Article Group Management**
+The system allows structured organization of help articles into groups:
+- **Group Creation and Management**:
+   - Standard groups for general article organization.
+   - Special Access Groups for secure, encrypted article storage.
+- **Admin Control**:
+   - Add or remove articles from groups.
+   - Assign multiple admins to manage groups.
+- **Access Control**:
+   - Group-level and article-level permissions for secure access.
+
+### 3. **Help Articles**
+Help articles provide detailed guidance, categorized by access level and group:
+- **Article Details**:
+   - Includes title, body, keywords, authors, and short descriptions.
+- **Access Levels**:
+   - Articles can be assigned access levels: `Beginner`, `Intermediate`, `Advanced`, `Expert`.
+- **Encryption**:
+   - Special Access Groups enable encryption for sensitive articles.
+- **Search and Management**:
+   - Admins and instructors can create, edit, and organize articles.
+
+### 4. **Help Messaging System**
+Users can submit help requests containing:
+- **Request Details**: Type, email, title, and body.
+- Admins and instructors can review and respond to help requests.
+
+## Key Components
+
+### Classes for User Management
+#### `User`
+- **Purpose**: Manages user account details and roles.
+- **Features**:
+   - Role management: `addRole()`, `removeRole()`, `hasRole()`.
+   - Secure setup with invitation codes and OTPs.
+   - Tracks active roles for multi-role users.
+
+#### `UserDatabase`
+- **Purpose**: Handles user storage and operations.
+- **Features**:
+   - User registration and invitation management.
+   - Role and account management for admins.
+   - Key methods: `inviteUser()`, `resetUserAccount()`, `generateInvitationCode()`.
+
+### Classes for Article Management
+#### `HelpArticle`
+- **Purpose**: Represents individual help articles.
+- **Features**:
+   - Stores metadata: title, authors, keywords, and access levels.
+   - Encryption support for sensitive articles in special groups.
+   - Group management integration.
+
+#### `ArticleDatabase`
+- **Purpose**: Centralizes management of articles and groups.
+- **Features**:
+   - Add, remove, and organize articles into groups.
+   - Manage special access permissions for secure articles.
+   - Key methods: `addArticle()`, `deleteArticle()`, `listArticlesToConsole()`.
+
+#### `SpecialAccessGroup`
+- **Purpose**: Provides encrypted storage and controlled access for sensitive articles.
+- **Features**:
+   - Encryption and decryption of article content.
+   - Viewer and admin permission management.
 
 ## Technologies Used
 
